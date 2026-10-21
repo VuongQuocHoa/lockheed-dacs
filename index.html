@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LOCKHEED DACS — Xưởng Lắp Ráp Tên Lửa &amp; Đánh Chặn 3D</title>
+    
+    <!-- Three.js r128 WebGL Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="webgl-container"></div>
+    <canvas id="ai-hud-canvas"></canvas>
+    <div id="tps-crosshair"></div>
+    <div id="bullet-time-banner">⏱️ BULLET-TIME SLOW-MO KÍCH HOẠT [Q / CHUỘT PHẢI]</div>
+
+    <div class="hud-layer" id="main-hud-layer">
+        <div class="top-bar">
+            <!-- Top Left: Missile Lab Telemetry -->
+            <div class="hud-card brand-card">
+                <div class="brand-head">
+                    <div class="brand-title">
+                        <span>🚀 LOCKHEED DACS MISSILE LAB</span>
+                    </div>
+                    <span id="assembly-badge" class="status-badge">CHƯA LẮP RÁP (0/6)</span>
+                </div>
+
+                <div class="telemetry-grid">
+                    <div class="tele-box">
+                        <div class="tele-lbl">VẬN TỐC</div>
+                        <div id="hud-mach" class="tele-val" style="color:#38bdf8;">0.0 M</div>
+                    </div>
+                    <div class="tele-box">
+                        <div class="tele-lbl">CỰ LY MỤC TIÊU</div>
+                        <div id="hud-dist" class="tele-val" style="color:#fb7185;">-- M</div>
+                    </div>
+                    <div class="tele-box">
+                        <div class="tele-lbl">KHỐI LƯỢNG</div>
+                        <div id="hud-mass" class="tele-val">0 KG</div>
+                    </div>
+                    <div class="tele-box">
+                        <div class="tele-lbl">ĐÁNH CHẶN</div>
+                        <div id="hud-hits" class="tele-val" style="color:#34d399;">0</div>
+                    </div>
+                </div>
+
+                <div class="progress-wrap">
+                    <div class="progress-head">
+                        <span>🔧 TIẾN ĐỘ LẮP RÁP MÔ-ĐUN TÊN LỬA</span>
+                        <span id="assembly-pct-txt">0 / 6 BỘ PHẬN</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="assembly-bar" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Right Quick Actions -->
+            <div class="hud-card" style="display:flex; gap:7px; align-items:center; flex-wrap:wrap;">
+                <button id="btn-cam" class="tgt-btn fpv-btn-highlight active">
+                    <span id="cam-txt">🎥 GÓC NHÌN: TPS CHUỘT HƯỚNG PUBG/FREE FIRE [C / V]</span>
+                </button>
+                <div id="cursor-mode-badge" title="Bấm hoặc nhấn phím ALT để bật/tắt tự do trỏ chuột như PUBG">
+                    🖱️ CHUỘT: <span id="cursor-status-txt" style="color:#fde047;">ĐANG KHÓA TPS [ALT]</span>
+                </div>
+                <button id="btn-slomo" class="tgt-btn" style="border-color:#ef4444; color:#fca5a5;">
+                    <span id="slomo-txt">⏱️ BULLET-TIME [Q]</span>
+                </button>
+                <button id="btn-angle" class="tgt-btn" style="border-color:#38bdf8;">
+                    <span id="angle-txt">📐 BỆ PHÓNG: NGHIÊNG 52° (ẢNH 1)</span>
+                </button>
+                <button id="btn-sound" class="tgt-btn">
+                    <span id="sound-txt">🔊 ÂM THANH</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="mid-workspace">
+            <!-- Left Dock: 6 Mandatory DIY Rocket Assembly Slots -->
+            <div class="hud-card assembly-dock" id="assembly-panel">
+                <div class="dock-header">
+                    <span class="dock-title">🛠️ LẮP RÁP TỪNG BỘ PHẬN (BẮT BUỘC)</span>
+                    <button id="btn-clear-all" style="cursor:pointer; background:rgba(244,63,94,0.18); border:1px solid #f43f5e; color:#fda4af; font-size:9.5px; font-weight:800; padding:3px 7px; border-radius:6px;">
+                        THÁO RỜI HẾT
+                    </button>
+                </div>
+
+                <!-- Slot 1: Engine Nozzle -->
+                <div class="slot-item" id="slot-card-engine">
+                    <div class="slot-top">
+                        <span class="slot-name">1. VÒI PHUN ĐỘNG CƠ ĐẨY CHÍNH</span>
+                        <span class="slot-tag" id="tag-engine">CHƯA LẮP</span>
+                    </div>
+                    <div class="part-btns">
+                        <button class="part-btn" data-slot="engine" data-type="solid">
+                            <span>🔥 Lửa Vàng Rực (Ảnh 1, 3, 5)</span>
+                            <span class="part-sub">Lực đẩy 42kN • Cột khói lớn</span>
+                        </button>
+                        <button class="part-btn" data-slot="engine" data-type="plasma">
+                            <span>⚡ Lửa Xanh Trắng (Ảnh 2)</span>
+                            <span class="part-sub">Lực đẩy 50kN • Bay Mach 5.5</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slot 2: Tail Fins -->
+                <div class="slot-item" id="slot-card-tailFins">
+                    <div class="slot-top">
+                        <span class="slot-name">2. CÁNH ĐUÔI KHÍ ĐỘNG HỌC</span>
+                        <span class="slot-tag" id="tag-tailFins">CHƯA LẮP</span>
+                    </div>
+                    <div class="part-btns">
+                        <button class="part-btn" data-slot="tailFins" data-type="qcc">
+                            <span>📐 Cánh Đuôi QCC Đỏ-Trắng (Ảnh 4)</span>
+                            <span class="part-sub">Ổn định quỹ đạo cao</span>
+                        </button>
+                        <button class="part-btn" data-slot="tailFins" data-type="tactical">
+                            <span>🦅 Cánh Chữ Thập Đen (Ảnh 1, 2)</span>
+                            <span class="part-sub">Cơ động bám mục tiêu gắt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slot 3: Main Fuel Body Tube -->
+                <div class="slot-item" id="slot-card-fuselage">
+                    <div class="slot-top">
+                        <span class="slot-name">3. THÂN NHIÊN LIỆU CHÍNH</span>
+                        <span class="slot-tag" id="tag-fuselage">CHƯA LẮP</span>
+                    </div>
+                    <div class="part-btns">
+                        <button class="part-btn" data-slot="fuselage" data-type="white">
+                            <span>🚀 Thân Trắng Explorer (Ảnh 3, 4)</span>
+                            <span class="part-sub">Nhiên liệu rắn tầm xa</span>
+                        </button>
+                        <button class="part-btn" data-slot="fuselage" data-type="stealth">
+                            <span>🛡️ Thân Xám Vạch Vàng-Đỏ (Ảnh 2)</span>
+                            <span class="part-sub">Vỏ hợp kim giảm cản gió</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slot 4: Side Intake Strakes / Boosters -->
+                <div class="slot-item" id="slot-card-strakes">
+                    <div class="slot-top">
+                        <span class="slot-name">4. ỐNG DẪN KHÍ &amp; ĐẨY PHỤ HÔNG</span>
+                        <span class="slot-tag" id="tag-strakes">CHƯA LẮP</span>
+                    </div>
+                    <div class="part-btns">
+                        <button class="part-btn" data-slot="strakes" data-type="qccStrakes">
+                            <span>✈️ 4 Cánh Dẫn Khí QCC (Ảnh 4)</span>
+                            <span class="part-sub">Tăng lực nâng dọc thân</span>
+                        </button>
+                        <button class="part-btn" data-slot="strakes" data-type="boosters">
+                            <span>🧨 2 Ống Đẩy Phụ (Ảnh 5)</span>
+                            <span class="part-sub">Tăng gia tốc vọt đầu</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slot 5: Lockheed DACS Lateral O2 Thruster Ring -->
+                <div class="slot-item" id="slot-card-dacs">
+                    <div class="slot-top">
+                        <span class="slot-name">5. KHOANG PHUN KHÍ O₂ NGANG DACS</span>
+                        <span class="slot-tag" id="tag-dacs">CHƯA LẮP</span>
+                    </div>
+                    <div class="part-btns">
+                        <button class="part-btn" data-slot="dacs" data-type="ring8">
+                            <span>💨 Vòng 8 Vòi O₂ Lockheed</span>
+                            <span class="part-sub">Phun khí O₂ bẻ hướng 360°</span>
+                        </button>
+                        <button class="part-btn" data-slot="dacs" data-type="canard">
+                            <span>💨 DACS + Cánh Nâu (Ảnh 1, 3)</span>
+                            <span class="part-sub">Phun O₂ + Cánh mũi Canard</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slot 6: Nose Cone & Radar Seeker -->
+                <div class="slot-item" id="slot-card-nose">
+                    <div class="slot-top">
+                        <span class="slot-name">6. MŨI DÒ MỤC TIÊU &amp; ĐẦU ĐẠN</span>
+                        <span class="slot-tag" id="tag-nose">CHƯA LẮP</span>
+                    </div>
+                    <div class="part-btns">
+                        <button class="part-btn" data-slot="nose" data-type="redOgive">
+                            <span>🎯 Mũi Nhọn Đỏ QCC (Ảnh 4)</span>
+                            <span class="part-sub">Radar chủ động khóa UAV</span>
+                        </button>
+                        <button class="part-btn" data-slot="nose" data-type="radome">
+                            <span>📡 Mũi Radome Quân Sự (Ảnh 2)</span>
+                            <span class="part-sub">Đầu dò tầm nhiệt đa phổ</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hud-card right-panel">
+                <div class="dock-title">🎯 CHỌN MỤC TIÊU DI ĐỘNG ĐỂ BẮN</div>
+                <div class="target-selector">
+                    <button class="tgt-btn active" data-target="drone">
+                        <span>✈️ UAV Phản Lực Siêu Thanh</span>
+                        <span style="font-size:9px; color:#fda4af;">BAY TRÊN KHÔNG</span>
+                    </button>
+                    <button class="tgt-btn" data-target="cruise">
+                        <span>🚀 Tên Lửa Hành Trình Địch</span>
+                        <span style="font-size:9px; color:#fcd34d;">CƠ ĐỘNG GẮT</span>
+                    </button>
+                    <button class="tgt-btn" data-target="convoy">
+                        <span>🚛 Xe Bệ Phóng Di Động</span>
+                        <span style="font-size:9px; color:#6ee7b7;">CHẠY DƯỚI ĐẤT</span>
+                    </button>
+                </div>
+
+                <div style="border-top:1px solid rgba(51,65,85,0.6); padding-top:8px; margin-top:2px;">
+                    <div class="dock-title" style="margin-bottom:6px;">💨 SƠ ĐỒ PHUN O₂ NGANG LOCKHEED DACS</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                        <svg width="86" height="86" viewBox="0 0 86 86" style="background:rgba(3,7,18,0.85); border:1px solid rgba(56,189,248,0.3); border-radius:12px; flex-shrink:0;">
+                            <circle cx="43" cy="43" r="18" fill="rgba(15,23,42,0.95)" stroke="#64748b" stroke-width="2"/>
+                            <circle cx="43" cy="43" r="5" fill="#f43f5e"/>
+                            <polygon id="dacs-svg-up" points="43,4 37,22 49,22" fill="#38bdf8" opacity="0.2"/>
+                            <polygon id="dacs-svg-down" points="43,82 37,64 49,64" fill="#38bdf8" opacity="0.2"/>
+                            <polygon id="dacs-svg-left" points="4,43 22,37 22,49" fill="#38bdf8" opacity="0.2"/>
+                            <polygon id="dacs-svg-right" points="82,43 64,37 64,49" fill="#38bdf8" opacity="0.2"/>
+                        </svg>
+                        <div style="font-size:10px; color:#cbd5e1; line-height:1.45;">
+                            Khi đang bay, bấm <strong>W/S/A/D</strong> hoặc bật <strong>Mouse Look / Khóa Radar [F]</strong> để phụt tia khí Oxy trắng vuông góc thân tên lửa, bẻ mũi lao thẳng vào mục tiêu di động.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div id="status-toast" class="toast-banner">
+                🛠️ Bệ phóng đang trống! Hãy bấm chọn từng bộ phận từ 1 đến 6 ở bảng bên trái để tự tay lắp ráp tên lửa.
+            </div>
+
+            <div class="hud-card flight-deck">
+                <button id="btn-launch" class="deck-btn launch-btn locked">
+                    <span id="launch-main-txt" style="font-size:12.5px;">🔒 CẦN LẮP ĐỦ 6 BỘ PHẬN</span>
+                    <span id="launch-sub-txt" style="font-size:9px; color:#fecdd3;">Lắp đủ 6 mô-đun để mở khóa [SPACE]</span>
+                </button>
+
+                <button id="btn-homing" class="deck-btn homing-btn active">
+                    <span>🎯 MOUSE LOOK THEO CHUỘT: BẬT</span>
+                    <span style="font-size:9px; color:#94a3b8;">Di chuột hướng nào quay hướng đó [F]</span>
+                </button>
+
+                <button id="ctrl-pitch-up" class="deck-btn">
+                    <span style="color:#38bdf8;">▲ NGẨNG MŨI [W]</span>
+                    <span style="font-size:8.5px; color:#94a3b8;">Phun O₂ Bụng</span>
+                </button>
+
+                <button id="ctrl-pitch-down" class="deck-btn">
+                    <span style="color:#38bdf8;">▼ CHÚI MŨI [S]</span>
+                    <span style="font-size:8.5px; color:#94a3b8;">Phun O₂ Lưng</span>
+                </button>
+
+                <button id="ctrl-yaw-left" class="deck-btn">
+                    <span style="color:#38bdf8;">◀ NGOẶT TRÁI [A]</span>
+                    <span style="font-size:8.5px; color:#94a3b8;">Phun O₂ Phải</span>
+                </button>
+
+                <button id="ctrl-yaw-right" class="deck-btn">
+                    <span style="color:#38bdf8;">▶ NGOẶT PHẢI [D]</span>
+                    <span style="font-size:8.5px; color:#94a3b8;">Phun O₂ Trái</span>
+                </button>
+
+                <button id="btn-reset-pad" class="deck-btn" style="border-color:#f59e0b;">
+                    <span style="color:#fcd34d;">🔄 VỀ BỆ LẮP RÁP [R]</span>
+                    <span style="font-size:8.5px; color:#94a3b8;">Chỉnh sửa / Phóng lại</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modular Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

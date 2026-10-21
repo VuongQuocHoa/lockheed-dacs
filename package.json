@@ -1,0 +1,22 @@
+{
+  "name": "lockheed-dacs-simulation",
+  "version": "1.0.0",
+  "description": "3D WebGL Aerospace Simulation: DIY Rocket Modular Assembly & Lockheed DACS Kinetic Interception System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "threejs",
+    "webgl",
+    "aerospace-simulation",
+    "dacs",
+    "missile-interception",
+    "lockheed-martin",
+    "proportional-navigation",
+    "physics-simulation"
+  ],
+  "author": "Vương Quốc Hòa <hoalkasd@gmail.com>",
+  "license": "MIT"
+}
