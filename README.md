@@ -1,5 +1,12 @@
 # 🚀 LOCKHEED DACS — Xưởng Lắp Ráp Tên Lửa & Đánh Chặn 3D (WebGL / Three.js)
 
+<div align="center">
+
+[![Live Demo on Render](https://img.shields.io/badge/🌐_Live_Demo-Render-00f0ff?style=for-the-badge&logo=render&logoColor=white)](https://vuongquochoa-lockheed-dacs.onrender.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/VuongQuocHoa/lockheed-dacs)
+
+</div>
+
 > **Hệ thống mô phỏng đồ họa 3D hàng không vũ trụ: Tự tay lắp ráp tên lửa 6 mô-đun & Hệ thống điều khiển đánh chặn xung lực ngang Lockheed Martin DACS (Divert and Attitude Control System)**
 
 Dự án mô phỏng thời gian thực xây dựng bằng **Three.js (WebGL)**, tích hợp vật lý động học bay, định luật dẫn đường tỷ lệ (Proportional Navigation), hệ thống điều hướng khí nén xung lực ngang DACS bẻ hướng tức thời và cơ chế điều khiển góc nhìn thứ 3 (TPS PUBG/Free Fire) với con trỏ khóa mục tiêu.
